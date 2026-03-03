@@ -61,21 +61,22 @@ export default class CseMachine {
   public static getStreamLineage(key: string): string[] | undefined {
     return CseMachine.streamLineage.get(key);
   }
-  public static getStreamPairIdToStreamId(key: string): string | undefined {
-    return CseMachine.streamPairIdToStreamId.get(key);
-  }
+  // public static getStreamPairIdToStreamId(key: string): string | undefined {
+  //   return CseMachine.streamPairIdToStreamId.get(key);
+  // }
   public static viewStreamLineage(): void {
-    console.log(CseMachine.streamLineage);
+    // console.log(CseMachine.streamLineage);
   }
-  public static findKeyByValueInMap(value: any) {
-    for (const [key, array] of CseMachine.streamLineage.entries()) { 
-      console.log(key + array);
-      if (array.includes(value)) {
-        return key; 
-      }
-    }
-    return undefined;
-  }
+  // public static findKeyByValueInMap(value: any) {
+  //   // console.log("---------------");
+  //   for (const [key, array] of CseMachine.streamLineage.entries()) { 
+  //     // console.log(key + array);
+  //     if (array.includes(value)) {
+  //       return key; 
+  //     }
+  //   }
+  //   return undefined;
+  // }
   public static isControl(): boolean {
     return this.control ? !this.control.isEmpty() : false;
   }
@@ -109,9 +110,6 @@ export default class CseMachine {
       throw new Error('CSE machine not initialized');
     CseMachine.control = context.runtime.control;
     CseMachine.stash = context.runtime.stash;
-    CseMachine.streamLineage = context.streamLineage;
-    CseMachine.streamPairIdToStreamId = context.streamPairIdToStreamId;
-    console.log(context.streamPairIdToStreamId);
 
     Layout.setContext(
       context.runtime.environmentTree as EnvTree,

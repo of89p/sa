@@ -13,6 +13,8 @@ import { ArrayUnit } from '../ArrayUnit';
 import { Binding } from '../Binding';
 import { FnValue } from './FnValue';
 import { Value } from './Value';
+import { cons } from 'js-slang/dist/alt-langs/scheme/scm-slang/src/stdlib/base';
+import { ThDisconnect } from '@blueprintjs/icons';
 
 /** this class encapsulates an array value in source,
  *  defined as a JS array with not 2 elements */
@@ -24,10 +26,6 @@ export class ArrayValue extends Value implements IHoverable {
   /** height of the array and nested values inside the array */
   totalHeight: number = 0;
 
-  private arrayIdWithinStream: number = 0;
-
-  private streamId: number = 0;
-
   constructor(
     /** underlying values this array contains */
     readonly data: DataArray,
@@ -36,20 +34,23 @@ export class ArrayValue extends Value implements IHoverable {
   ) {
     super();
     Layout.memoizeValue(data, this);
-    
-    const streamIdString = CseMachine.getStreamPairIdToStreamId(data.id);
 
-    if (streamIdString != undefined) {
-      this.streamId = parseInt(streamIdString);
-      const streamPairCount = Layout.streamLengthMap.get(streamIdString);
-      if (streamPairCount != undefined) {
-        Layout.streamLengthMap.set(streamIdString, streamPairCount + 1);
-        this.arrayIdWithinStream = streamPairCount;
-      } else {
-        Layout.streamLengthMap.set(streamIdString, 1);
-        this.arrayIdWithinStream = 0;
-      }
-    }
+    console.log("this:"+ this.data)
+
+    
+    // const streamIdString = CseMachine.getStreamPairIdToStreamId(data.id);
+
+    // if (streamIdString != undefined) {
+    //   this.streamId = parseInt(streamIdString);
+    //   const streamPairCount = Layout.streamLengthMap.get(streamIdString);
+    //   if (streamPairCount != undefined) {
+    //     Layout.streamLengthMap.set(streamIdString, streamPairCount + 1);
+    //     this.arrayIdWithinStream = streamPairCount;
+    //   } else {
+    //     Layout.streamLengthMap.set(streamIdString, 1);
+    //     this.arrayIdWithinStream = 0;
+    //   }
+    // }
 
     // if (this.arrayId > 0 && Layout.streamPairArray[this.arrayId - 1].data[1] instanceof Closure) {
     //   let prevFn: FnValue = Layout.streamPairArray[this.arrayId - 1].data[1];
@@ -58,14 +59,18 @@ export class ArrayValue extends Value implements IHoverable {
     
     this.addReference(firstReference);
     /** handling pairs for stream visualisation */
-    let num = 1;
     if (data[1] instanceof Closure) {
-      console.log(num);
-      num+=1;
-      const originFnId = CseMachine.findKeyByValueInMap(data.id);
+      console.log("yes");
+      console.log(data[1]);
+      const originFnId = (this.data as any).streamDetails.parentNullaryFnId;
 
+      // let layoutval = Layout.values;
+      console.log(Layout.values);
 
-      if (originFnId != undefined) {
+      if (originFnId != undefined && Layout.values.get(originFnId) != undefined) {
+        console.log(data);
+        console.log(originFnId);
+        // console.log("originFnId: "+originFnId);
         // console.log("result of finding fn that created this array: " + Layout.values.get(originFnId));
         (Layout.values.get(originFnId) as FnValue).addArrow(this);
       }
@@ -77,12 +82,14 @@ export class ArrayValue extends Value implements IHoverable {
 
     // derive the coordinates from the main reference (binding / array unit)
     if (newReference instanceof Binding) {
+
       if (!CseMachine.getPairCreationMode()) {
         this._x = newReference.frame.x() + newReference.frame.width() + Config.FrameMarginX;
         this._y = newReference.y();
       } else {
-        this._x = Config.CanvasPaddingX + this.arrayIdWithinStream * (Config.DataUnitWidth * 5);
-        this._y = (Config.DataUnitHeight * 2) * this.streamId;
+        this._x = Config.CanvasPaddingX + parseInt(this.data.id) * 40 + (Config.DataUnitWidth * 5);
+        this._y = (Config.DataUnitHeight * 2) + parseInt(this.data.id)*10;
+        console.log(parseInt(this.data.id));
       }
     } else {
       if (newReference.isLastUnit) {
@@ -151,6 +158,7 @@ export class ArrayValue extends Value implements IHoverable {
   draw(): React.ReactNode {
     if (this.isDrawn()) return null;
     this._isDrawn = true;
+
     return (
       <Group
         key={Layout.key++}
