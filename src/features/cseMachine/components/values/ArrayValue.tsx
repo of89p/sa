@@ -1,3 +1,5 @@
+import { ThDisconnect } from '@blueprintjs/icons';
+import { cons } from 'js-slang/dist/alt-langs/scheme/scm-slang/src/stdlib/base';
 import Closure from 'js-slang/dist/cse-machine/closure';
 import { KonvaEventObject } from 'konva/lib/Node';
 import React from 'react';
@@ -13,8 +15,6 @@ import { ArrayUnit } from '../ArrayUnit';
 import { Binding } from '../Binding';
 import { FnValue } from './FnValue';
 import { Value } from './Value';
-import { cons } from 'js-slang/dist/alt-langs/scheme/scm-slang/src/stdlib/base';
-import { ThDisconnect } from '@blueprintjs/icons';
 
 /** this class encapsulates an array value in source,
  *  defined as a JS array with not 2 elements */
@@ -66,6 +66,7 @@ export class ArrayValue extends Value implements IHoverable {
 
       // let layoutval = Layout.values;
       console.log(Layout.values);
+      console.log("my sttream is" + (this.data as any).streamDetails.streamPairNumber);
 
       if (originFnId != undefined && Layout.values.get(originFnId) != undefined) {
         console.log(data);
